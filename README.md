@@ -1,2 +1,2 @@
 # Capstone
-Android app linked with a server side database that spreads local warnings based on user location.
+Android app linked with a web application that spreads local warnings based on user location.
