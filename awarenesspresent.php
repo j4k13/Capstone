@@ -10,8 +10,20 @@ and open the template in the editor.
         <title>Project Awareness</title>
     </head>
     <body>
-        Alerts For <?php echo $_GET["county"]?><br>
-        Alerts For <?php echo $_GET["city"]?><br>
-        Alerts For <?php echo $_GET["zip"]?><br>
+	<?php
+	$location = $_GET["location"];
+	if(empty($_GET["location"])){
+	echo "You must provide a location";
+	}
+	else{
+		if(false)
+		{
+		echo "Alerts For ", $location, "<br>";
+        	}
+		else{
+		echo "Entered location is outside of project's current scope";
+		}
+	}
+	?>
     </body>
 </html>
