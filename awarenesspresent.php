@@ -36,15 +36,17 @@ and open the template in the editor.
 		while(!feof($searchfile))
 		{
 			$nextitem = fgets($searchfile);
-			if($lotosearch === $nextitem)
+			echo $nextitem;
+			if($lotosearch == $nextitem)
 			{
 				return true;		
 			}
 		}
+		fclose($searchfile);
 		//----------and here
 		//parse counties
 		//parse cities
-		return true;
+		return false;
 	}
 	?>
     </body>
