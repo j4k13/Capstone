@@ -20,7 +20,7 @@ and open the template in the editor.
 		if($flag)
 		{
 		echo "Alerts For ", $location, "<br>";
-
+		GetContents($location);
         	}
 		else{
 		echo "Entered location is outside of project's current scope";
@@ -36,7 +36,7 @@ and open the template in the editor.
 		while(!feof($searchfile))
 		{
 			$nextitem = fgets($searchfile);
-			echo $nextitem;
+			//echo $nextitem;
 			if($lotosearch == $nextitem)
 			{
 				return true;		
@@ -47,6 +47,19 @@ and open the template in the editor.
 		//parse counties
 		//parse cities
 		return false;
+	}
+	function GetContents($filetoread)
+	{
+		set_include_path("/var/www/html/Capstone/LocationFiles/");
+		//echo "no thanks";
+		
+		$dataget = fopen($filetoread,"r",1) or die("Didn't open");
+		while(!feof($dataget))
+		{	
+			$nextline = fgets($dataget);	
+			echo $nextline."<br>";
+		}
+		fclose($dataget);		
 	}
 	?>
     </body>
