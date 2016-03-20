@@ -1,0 +1,5 @@
+#!/bin/bash
+IFS=''
+while read line; do
+	touch /var/www/html/Capstone/LocationFiles/$line
+done < "$1"
