@@ -16,38 +16,9 @@ and open the template in the editor.
 	echo "You must provide a location";
 	}
 	else{
-		$flag = DetectLoc($location);
-		if($flag)
-		{
 		echo "Alerts For ", $location, "<br>";
 		GetContents($location);
-        	}
-		else{
-		echo "Entered location is outside of project's current scope";
-		}
-	}
-	function DetectLoc($loctosearch)
-	{
-		
-		//problem is between here
-		$searchfile = fopen("zips.txt","r") or die("Didn't find");
-		$nextitem = "";
-		//parse zip codes
-		while(!feof($searchfile))
-		{
-			$nextitem = fgets($searchfile);
-			//echo $nextitem;
-			if($lotosearch == $nextitem)
-			{
-				return true;		
-			}
-		}
-		fclose($searchfile);
-		//----------and here
-		//parse counties
-		//parse cities
-		return false;
-	}
+        }
 	function GetContents($filetoread)
 	{
 		set_include_path("/var/www/html/Capstone/LocationFiles/");
