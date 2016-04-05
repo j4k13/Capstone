@@ -25,8 +25,19 @@
 		$current = file_get_contents("weather.txt");
 		$new = file_get_contents("temp.txt");
 		file_put_contents($current,$new);
-		//if different push updates
-		
+		$log = fopen("log.txt","a+");
+		$update = "Updated Weather.txt\n";
+		fwrite($log,$update);
+		//push updates
+		//update about pushing
+		fclose($log);
+	}
+	else
+	{
+		$log = fopen("log.txt","a+");
+		$update = "No new warnings";
+		fwrite($log,$update);
+		fclose($log);		
 	}
 	//close file	
 	fclose($weathertxt);
