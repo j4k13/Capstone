@@ -31,7 +31,7 @@
 		$log = fopen("log.txt","a+");
 		$update = "Updated Weather\n";
 		fwrite($log,$update);
-		//push updates
+		parseWeather();
 		//update about pushing
 		fclose($log);
 	}
@@ -127,7 +127,34 @@
 	//function that parses weather page
 	function parseWeather()
 	{
-		
+		var_dump("made it");
+		set_include_path("/var/www/html/Capstone/LocationFiles/");
+		$whereFile = file_get_contents("weather.txt");
+	        $whereMatch[] = 0;
+        	preg_match_all("#<cap:areaDesc>(.*?)</cap:areaDesc>#",$whereFile,$whereMatch);
+        	//var_dump($whereMatch[1]);
+        	$whatMatch[] = 0;
+        	preg_match_all("#<summary>(.*?)</summary>#",$whereFile,$whatMatch);
+        	//var_dump($whatMatch[1]);
+		$whatiterator = 0;
+		//$whereiterator = 0;
+		foreach($whatMatch[1] as $thewhat)
+		{
+			foreach($whereMatch[1] as $thewhere)	
+			{
+				$allPlaces = explode("; ",$whereMatch[1][$whatiterator]);
+				foreach($allPlaces as $county)
+				{
+					$county .= ".txt";
+					$towrite = fopen($county,"a+");
+					$thething = $thewhat;
+					$thething .= "\n";
+					fwrite($towrite,$thething);
+				}		
+			}
+			$whatiterator = $whatiterator + 1;
+		}
+
 	}
 	
 	//parse persons page
