@@ -31,7 +31,7 @@
 		$log = fopen("log.txt","a+");
 		$update = "Updated Weather\n";
 		fwrite($log,$update);
-		parseWeather();
+
 		//update about pushing
 		fclose($log);
 	}
@@ -45,52 +45,12 @@
 	//close file	
 	fclose($weathertxt);
 	
-	//check missing persons
-	//--------------------------------------------------------------------
-        //get hash from last check
-        $lastcheck = md5_file("persons.txt");
-        //initialize curl for weather page
-        $personpage = curl_init("https://docs.google.com/document/u/1/d/1AO6ts-ILTyO2pyBAqoqOSJuXpvMA2KWB8bJnFy2SJug/pub");
-        //open file to write
-        $persontxt = fopen("tempp.txt","w");
-        //set curl to write file
-        curl_setopt($personpage, CURLOPT_FILE, $persontxt);
-        //execute page pull and write
-        curl_exec($personpage);
-        //close curl session
-        curl_close($personpage);
-        //take hash of incoming data
-        $newdata = md5_file("tempp.txt");
-        //compare new page to back up
-        if($lastcheck != $newdata)
-        {
-                //load changes to persons.txt
-                //$current = fopen("persons.txt","w");
-                $new = file_get_contents("tempp.txt");
-                file_put_contents("persons.txt",$new);
-                $log = fopen("log.txt","a+");
-                $update = "Updated Missing Persons\n";
-                fwrite($log,$update);
-                //push updates
-                //update about pushing
-                fclose($log);
-        }
-        else
-        {
-                $log = fopen("log.txt","a+");
-                $update = "No new missing people";
-                fwrite($log,$update);
-                fclose($log);
-        }
-        //close file    
-        fclose($persontxt);
-
 	//checking traffic
 	//--------------------------------------------------------------------
         //get hash from last check
         $lastcheck = md5_file("traffic.txt");
         //initialize curl for traffic page
-        $trafficpage = curl_init("http://www.511virginia.org/");
+        $trafficpage = curl_init("http://www.511virginia.org/mobile/?menu_id=twitter");
         //open file to write
         $traffictxt = fopen("tempt.txt","w");
         //set curl to write file
@@ -123,50 +83,4 @@
         }
         //close file    
         fclose($traffictxt);
-	
-	//function that parses weather page
-	function parseWeather()
-	{
-		var_dump("made it");
-		set_include_path("/var/www/html/Capstone/LocationFiles/");
-		$whereFile = file_get_contents("weather.txt");
-	        $whereMatch[] = 0;
-        	preg_match_all("#<cap:areaDesc>(.*?)</cap:areaDesc>#",$whereFile,$whereMatch);
-        	//var_dump($whereMatch[1]);
-        	$whatMatch[] = 0;
-        	preg_match_all("#<summary>(.*?)</summary>#",$whereFile,$whatMatch);
-        	//var_dump($whatMatch[1]);
-		$whatiterator = 0;
-		//$whereiterator = 0;
-		foreach($whatMatch[1] as $thewhat)
-		{
-			foreach($whereMatch[1] as $thewhere)	
-			{
-				$allPlaces = explode("; ",$whereMatch[1][$whatiterator]);
-				foreach($allPlaces as $county)
-				{
-					$county .= ".txt";
-					$towrite = fopen($county,"a+");
-					$thething = $thewhat;
-					$thething .= "\n";
-					fwrite($towrite,$thething);
-				}		
-			}
-			$whatiterator = $whatiterator + 1;
-		}
-
-	}
-	
-	//parse persons page
-	function parsePersons()
-	{
-		
-	}
-
-
-	//parse traffic
-	function parseTraffic()
-	{
-		
-	}
-?>
+?>		

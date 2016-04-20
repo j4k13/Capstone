@@ -1,0 +1,894 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!--
+   Copyright (c) 2004, 2005, 2006
+   All Rights Reserved
+   Meridian Environmental Technology, Inc.
+   4324 University Avenue, Grand Forks, ND 58203
+   http://meridian-enviro.com
+-->
+<head>
+<meta name="MSSmartTagsPreventParsing" content="TRUE" />
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+
+<title> - Mobile Feeds</title>
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="shared/style/text-rich-header.css" />
+<link rel="stylesheet" type="text/css" href="style/datatable.css" />
+<link rel="stylesheet" type="text/css" href="http://files0.iteriscdn.com/jquery/core/css/vdot/jquery-ui-1.8.18.custom.css" />
+<link rel="stylesheet" type="text/css" href="http://files0.iteriscdn.com/jquery/plugins/checkboxTree/0.5.2/jquery.checkboxtree.css"/>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-layout/1.3.0-rc-30.79/jquery.layout.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/yepnope/1.5.3/yepnope.min.js"></script>
+<script type="text/javascript" src="shared/initialLoad.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $( "#modal" ).dialog({ 
+            modal: true,
+            autoOpen: false, 
+            closeOnEscape: true,
+            draggable: false
+        });
+    });
+</script>
+<script type="text/javascript">
+   function openD(){
+        $("#modal").dialog( 'open' );
+    };
+</script>
+<script type="text/javascript">
+// <![CDATA[
+function bannerTimer(){
+    setBanner();
+    setTimeout(bannerTimer, 40000);  //40 seconds * 1000 milliseconds); //Set banner set to swap 10 seconds per banner.
+}
+bannerTimer();
+
+function setBanner() {
+	$.getJSON('../data/bannerAds.json', function(json) {
+        timedText();
+        function timedText() {
+            var rand=Math.random();
+            $("#vaBanner").html('<a href="' + json.banner[0].href + '" target="_blank" alt_text="' + json.banner[0].alt + '"><img src="' + json.banner[0].img +'?ver='+rand+'" ></a>');
+            setTimeout(function(){$("#vaBanner").html('<a href="' + json.banner[1].href + '" target="_blank" alt_text="' + json.banner[1].alt + '"><img src="' + json.banner[1].img +'?ver='+rand+'" ></a>');},10000);
+            setTimeout(function(){$("#vaBanner").html('<a href="' + json.banner[2].href + '" target="_blank" alt_text="' + json.banner[2].alt + '"><img src="' + json.banner[2].img +'?ver='+rand+'" ></a>');},20000);
+            setTimeout(function(){$("#vaBanner").html('<a href="' + json.banner[3].href + '" target="_blank" alt_text="' + json.banner[3].alt + '"><img src="' + json.banner[3].img +'?ver='+rand+'" ></a>');},30000);
+        }
+	});
+}//]]>
+</script>
+
+<div id="commonBanner">
+    <span class="screenReaderOnly"><a title="Skip to Content" href="#skipPoint">Skip to Content</a></span>
+    <div><a class="virginiaLogo" title="Virginia.gov portal" href="http://www.virginia.gov/"> </a></div>
+    <div class="alignLeft">
+        <a title="Virginia agency websites" href="http://www.virginia.gov/government/state-employees/agency-directory">Agencies</a> | 
+<a title="Virginia Governor" href="http://www.governor.virginia.gov">Governor</a>
+    </div>
+	<div id="virginiaSearch">
+        <a title="Search Virginia.Gov" href="http://www.virginia.gov/search">Search Virginia.Gov</a>
+    </div>
+</div>
+
+<div style="clear: both;"></div>
+
+<div style="position: relative; height:100px;">
+	<div id="banner_bar" class="banner_bar">
+        <table cellpadding="0" cellspacing="0" style="width: 100%;">
+            <tr>
+                <td>
+                    <a href="http://www.virginiadot.org/" target="_blank">
+                        <img src="shared/images/VDOT-511-header.png" id="vdot_header" alt="Virginia Department of Transportation" style="float: left;" />
+                    </a>
+                </td>
+                <td align="right" style="overflow: hidden;">
+                    <div id="vaBanner"></div>
+                </td>
+            </tr>
+        </table>
+	</div>
+</div>
+<div id="top_bar">
+    <script type="text/javascript">
+    function render_menu(callback){
+        yepnope({
+            load: [
+                'css!http://files0.iteriscdn.com/jquery/plugins/liscroll/li-scroller.css',
+                'css!http://cdn.kendostatic.com/2011.3.1129/styles/kendo.common.min.css',
+                'css!http://cdn.kendostatic.com/2011.3.1129/styles/kendo.default.min.css',
+                'http://files0.iteriscdn.com/jquery/plugins/zrssfeed/jquery.zrssfeed.min.js',
+                'http://files0.iteriscdn.com/jquery/plugins/vticker/jquery.vticker.js',
+                'http://files0.iteriscdn.com/jquery/plugins/liscroll/jquery.li-scroller.js',
+                'http://cdn.kendostatic.com/2011.3.1129/js/kendo.all.min.js'
+            ],
+            complete: function () {
+                updateFloodgates();
+                var menu = $("#topmenu").kendoMenu({
+                    openOnClick: true,
+                    closeOnClick: true,
+                    animation: {
+                        open: {effects:'fadeIn'}
+                    }
+                });
+
+                $('#login_dialog').dialog({ autoOpen: false, modal: true });
+                // give it a little bit of time to render before showing it;
+                // this helps reduce the chances of visual flickering
+                setTimeout(function() {
+                    $("#topmenu").css('visibility', 'visible')
+                    refresh_views();
+                    refresh_cameras();
+                    if(callback) callback(menu);
+                }, 500);
+            }
+        });
+    }
+
+    /*var floodgateTimer;
+    var floodgateLastUpdate;
+    var floodgateInterval = 60000;
+
+    function updateFloodgates() {
+        var rss_url = 'http://www.virginiadot.org/emergency.xml';
+        var suffix = escape(new Date()); // A little hack to get around google caching vdot's stuff.
+        var curTime = (new Date()).getTime();
+        if(floodgateLastUpdate == null || ((curTime - floodgateLastUpdate) > floodgateInterval)) {
+            floodgateLastUpdate = curTime;
+            if($.isFunction($('#floodgate').rssfeed)  &&  $.isFunction($('#rssBody_ul').liScroll)) {
+                $('#floodgate').rssfeed(rss_url + '?now=' + suffix, {limit: 1, header: false, titletag: 'p', 'date': false, content: false, linktarget: '_blank' },
+                    function(e){
+                        var str = $(e).find('ul#rssBody_ul').html();
+                        if(!str) $("#alert_overlay").hide();
+                        else {
+                            $("#alert_overlay").show();
+                            $(e).find('ul#rssBody_ul').liScroll();
+                        }
+                    }
+                );
+            }
+        }
+        floodgateTimer = setTimeout(updateFloodgates, floodgateInterval);
+    }*/
+
+	$("#floodgate").css('display', 'none');
+
+	var currentFloodgateItems = null;
+	var currentFloodgateIndex = 0;
+	var lastFloodgateUpdate = Math.floor(Date.now() / 1000);
+	
+	function updateFloodgates() {
+		if(currentFloodgateItems == null || (Math.floor(Date.now() / 1000) - lastFloodgateUpdate) > 120 ) { 
+			lastFloodgateUpdate = Math.floor(Date.now() / 1000);
+			currentFloodgateIndex = 0;
+			$.ajax("http://www.511virginia.org/rssfeed/emergency.xml", {
+				contentType:"application/xml",
+				success:function(xml) {
+					currentFloodgateItems = $(xml).find( "item" );
+					if(currentFloodgateItems.length==0) {
+						$("#floodgate").css('display', 'none');
+					} else {
+						$("#floodgate").css('display', '');
+						var itemTitle = $(currentFloodgateItems[currentFloodgateIndex]).find('title');
+						var itemLink = $(currentFloodgateItems[currentFloodgateIndex]).find('link');
+
+						//if IE paradigm, else sane browsers
+						if(itemTitle[0] && itemTitle[0].textContent) {
+							$('#floodgate').empty().append('<div style="font-size:1.16em;"><a href="' + itemLink[0].textContent  + '">' + itemTitle[0].textContent + ' </a></div>')
+						} else {
+							$('#floodgate').empty().append('<div style="font-size:1.16em;"><a href="' + $(itemLink)[0].innerHTML  + '">' + $(itemTitle)[0].innerHTML + ' </a></div>')
+						}
+						currentFloodgateIndex++;
+					}
+				},
+				error:function() {
+						$("#floodgate").css('display', 'none');
+				}
+			})
+		} else {
+			if(currentFloodgateItems == null || currentFloodgateItems.length == 0) {
+				return;
+			}
+
+			if(currentFloodgateIndex == currentFloodgateItems.length) {
+				currentFloodgateIndex = 0;
+			}
+			
+			var itemTitle = $(currentFloodgateItems[currentFloodgateIndex]).find('title');
+			var itemLink = $(currentFloodgateItems[currentFloodgateIndex]).find('link');
+
+			//if IE paradigm, else sane browsers
+			if(itemTitle[0] && itemTitle[0].textContent) {
+				$('#floodgate').empty().append('<div style="font-size:1.16em;"><a href="' + itemLink[0].textContent  + '">' + itemTitle[0].textContent + ' </a></div>')
+			} else {
+				$('#floodgate').empty().append('<div style="font-size:1.16em;"><a href="' + $(itemLink)[0].innerHTML  + '">' + $(itemTitle)[0].innerHTML + ' </a></div>')
+			}
+
+			currentFloodgateIndex++;
+		}
+	};
+
+	setInterval(updateFloodgates, 10000);
+
+
+    function load_link(url, replaceCurrent) {
+        replaceCurrent ? location.replace(url) : window.open(url);
+    }
+</script>
+<div id="login_dialog" style="display: none;">
+    <div>
+        <div class="login_form_container">
+	<script type="text/javascript" src="md5.js"></script>
+	<script type="text/javascript">//<![CDATA[
+		function good_email(email) {
+			return /^([^\@\s\<\>\"\[\]\\]+\@(?:[^\@\s\<\>\"\[\]\\\.]+\.)+[^\@\s\<\>\"\[\]\\\.]+)$/.test(email);
+		}
+
+		function check_username() {
+			var widget = document.getElementById("username");
+			if(widget.id != "username") return;  // IE 7 returns the wrong object here.
+			if(widget.value == "" || good_email(widget.value)) {
+				widget.style.backgroundColor = "";
+			} else {
+				widget.style.backgroundColor = "#FFBBBB";
+			}
+			return;
+		}
+
+		var access_code_salt = unescape("");
+		var access_code_hash = unescape("");
+		function check_access_code() {
+			if(access_code_hash == "") return true;
+
+			var widget = document.getElementById("access_code");
+
+			if(widget.value == "") {
+				widget.style.backgroundColor = "";
+				return false;
+			}
+
+			if(MD5(access_code_salt + "\0" + widget.value) != access_code_hash) {
+				widget.style.backgroundColor = "#FFBBBB";
+				return false;
+			}
+
+			widget.style.backgroundColor = "gray";
+			widget.readOnly = "readonly";
+			return true;
+		}
+
+		function submit_validate() {
+			if(! check_access_code()) {
+				document.getElementById("access_code").focus();
+				alert("Please enter the correct access code.");
+				return false;
+			}
+
+			var username = document.getElementById("username").value;
+			if(username.id != "username") return true;  // IE 7 returns the wrong object here.
+			if(! /\S/.test(username)) {
+				document.getElementById("username").focus();
+				alert("Please enter your email address.");
+				return false;
+			}
+			if(! good_email(username)) {
+				document.getElementById("username").focus();
+				alert("Please correct your email address.");
+				return false;
+			}
+
+			return true;
+		}
+	//]]></script>
+	<form method="post" action="/login/?destination=/mobile">
+	<fieldset>
+	<legend>Log In</legend>
+					<label for="login_username">Email address</label><br />
+					<input type="text" id="login_username" name="username" value="" size="16" maxlength="64" /><br />
+					<label for="login_password">Password</label><br />
+					<input type="password" id="login_password" name="password" size="16" /><br />
+					<input type="checkbox" id="save_login" name="stay_in" value="1" /><label for="save_login">Stay logged in</label><br />
+					<input type="submit" name="action_login" value="Log In" /><input type="submit" name="action_password" value="Forgot Password" />
+	</fieldset>
+	</form>
+
+	<form method="post" action="/login/?destination=/mobile">
+	<fieldset>
+		<legend>Create an Account</legend>
+				<label for="username">Your email address</label><br />
+					<input type="text" id="username" name="username" value="" size="16" maxlength="64" onblur="check_username();" onkeyup="check_username();" /><br />
+					<input type="submit" name="action_create" value="Create Account" onclick="return submit_validate();" />&nbsp;
+	</fieldset>
+	</form>
+</div>
+
+    </div>
+</div>
+<script type="text/javascript">//<![CDATA[
+    function show_login() { $('#login_dialog').dialog('open'); }
+    function hide_login() { $('#login_dialog').dialog('close'); }
+//]]></script>
+<table cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="width: 21px;">
+            <div style="background: url('http://files0.iteriscdn.com/WebApps/VA/SafeTravel/images/menu-left.png') repeat-x 0 0; height: 30px; width: 21px;"></div>
+        </td>
+        <td>
+            <div style="background: url('../images/menu-bg.png') repeat-x; height: 30px;">
+                <div style="position: relative; top: 5px; visibility: hidden;" id="menu_container">
+                    <div class="k-content" style="z-index: auto; font-size:9pt;">
+                        <ul id="topmenu" style="visibility: hidden;">
+                            <li id="menu-my_511">My 511
+                                <ul>
+                                    
+                                    
+                                        <li onclick="show_login();">Log in or create an account to customize</li>
+                                    
+                                </ul>
+                            </li>
+                            <li>Map Views
+                                <ul>
+                                    <li onclick="get_best_zoom(false, {changeZoomLevel: true});" id="view_entire_state_link">View Entire State</li>
+                                    <li>View a Region
+                                        <ul>
+                                            <li onclick="quick_jump(38.069, -79.596, 36.971, -76.630);">Central Virginia </li>
+                                            <li onclick="quick_jump(37.754, -77.944, 36.280, -74.774);">Hampton Roads</li>
+                                            <li onclick="quick_jump(38.981, -78.506, 38.199, -76.303);">Northern Virginia</li>
+                                            <li onclick="quick_jump(37.887, -80.125, 39.329, -76.955);">Northwestern Virginia</li>
+                                            <li onclick="quick_jump(38.020, -81.531, 36.551, -78.362);">Southwest Virginia</li>
+                                        </ul>
+                                    </li>
+                                    <li id="menu_view_a_city">View a City
+                                        <ul>
+                                            <li onclick="quick_jump(37.25, -80.49, 37.19, -80.36);">Blacksburg</li>
+                                            <li onclick="quick_jump(36.64, -82.24, 36.58, -82.10);">Bristol</li>
+                                            <li onclick="quick_jump(38.06, -78.55, 38.00, -78.41);">Charlottesville</li>
+                                            <li onclick="quick_jump(36.81, -76.43, 36.69, -76.15);">Chesapeake</li>
+                                            <li onclick="quick_jump(38.37, -77.60, 38.25, -77.33);">Fredericksburg</li>
+                                            <li onclick="quick_jump(37.12, -76.55, 37.00, -76.28);">Hampton &amp; Newport News</li>
+                                            <li onclick="quick_jump(38.47, -78.93, 38.41, -78.81);">Harrisonburg</li>
+                                            <li onclick="quick_jump(37.45, -79.32, 37.33, -79.05);">Lynchburg</li>
+                                            <li onclick="quick_jump(36.97, -76.55, 36.72, -76.00);">Norfolk</li>
+                                            <li onclick="quick_jump(39.09, -77.98, 38.61, -76.89);">Northern Virginia Metro Area</li>
+                                            <li onclick="quick_jump(36.85, -76.47, 36.73, -76.20);">Portsmouth</li>
+                                            <li onclick="quick_jump(37.75, -77.95, 37.26, -76.86);">Richmond</li>
+                                            <li onclick="quick_jump(37.33, -80.08, 37.21, -79.81);">Roanoke</li>
+                                            <li onclick="quick_jump(36.94, -76.30, 36.69, -75.75);">Virginia Beach</li>
+                                            <li onclick="quick_jump(37.28, -76.74, 37.25, -76.6);">Williamsburg</li>
+                                            <li onclick="quick_jump(39.20, -78.23, 39.14, -78.09);">Winchester</li>
+                                        </ul>
+                                    </li>
+                                    
+                                </ul>
+                            </li>
+                            <li>Text Views
+                                <ul>
+                                    <li onclick="load_link('../mobile/?menu_id=incidents');">Incidents Table</li>
+                                    <li onclick="load_link('../mobile/?menu_id=conditions');">Road Conditions Table</li>
+                                    <li onclick="load_link('../mobile/?menu_id=traveltimes');">Travel Times Table</li>
+                                    <li onclick="load_link('../mobile/?menu_id=twitter');">Mobile Feeds</li>
+                                    <li onclick="load_link('../mobile/');">Text Only Version</li>
+                                    <li onclick="load_link('../mobile/?menu_id=rssfeeds');">RSS Feeds</li>
+                                </ul>
+                            </li>
+                            <li>Resources
+                                
+                                <ul>
+                                    <li onclick="load_link('http://www.virginiadot.org/travel/511.asp');">Mobile Apps</li>
+                                    <li onclick="load_link('http://www.ezpassva.com/');">E-ZPass</li>
+                                    <li onclick="load_link('http://www.virginiadot.org/travel/map-rest-area.asp');">Rest Areas in the Commonwealth</li>
+                                    <li onclick="load_link('http://maps.nps.gov/blri/road-closures/');">Blue Ridge Parkway</li>
+                                    <li>Commuting Sites
+                                        <ul>
+                                            <li onclick="load_link('http://www.neckride.org/');">Northern Neck Rideshare</li>
+                                            <li onclick="load_link('http://www.ridefinders.com/');">Richmond Ridefinders</li>
+                                            <li onclick="load_link('http://www.gohrt.com/');">Hampton Roads</li>
+                                            <li onclick="load_link('http://www.midpenrideshare.org/');">Middle Peninsula Rideshare</li>
+                                            <li onclick="load_link('http://www.commuterpage.com/');">Arlington County Commuter Services</li>
+                                            <li onclick="load_link('http://www.alexandriava.gov/localmotion/');">Alexandria Rideshare</li>
+                                            <li onclick="load_link('http://www.mwcog.org/commuter2/');">Commuter Connections (Northern Virginia)</li>
+                                            <li onclick="load_link('http://www.fairfaxcounty.gov/fcdot/sources.htm');">Fairfax County RideSources</li>
+                                            <li onclick="load_link('http://www.gwrideconnect.org/');">GW Ride Connections</li>
+                                            <li onclick="load_link('http://www.loudoun.gov/index.aspx?NID=268');">Loudoun County Commuter Services</li>
+                                            <li onclick="load_link('http://www.prtctransit.org/ridesharing/');">PRTC OmniRide</li>
+                                            <li onclick="load_link('http://www.rrcommute.org/');">Rappahannock Rapidan Commuter Services</li>
+                                            <li onclick="load_link('http://www.rideshareinfo.org/');">RideShare (Central Virginia)</li>
+                                            <li onclick="load_link('http://www.vcapride.virginia.gov/');">Ride Smart (Northern Shenandoah Valley)</li>
+                                            <li onclick="load_link('http://ridesolutions.org/');">Ridesolutions (Southwest Virginia)</li>
+                                            <li onclick="load_link('http://www.nuride.com/');">NuRide</li>
+                                        </ul>
+                                    </li>
+                                    <li>Public Transit
+                                        <ul>
+                                            <li onclick="load_link('http://www.greyhound.com/');">Greyhound</li>
+                                            <li onclick="load_link('http://www.trailways.com/');">Trailways</li>
+                                            <li onclick="load_link('http://www.drpt.virginia.gov/service-locator/');">DRPT Service Locator</li>
+                                            <li onclick="load_link('http://www.amtrakvirginia.com/');">Amtrak</li>
+                                            <li onclick="load_link('http://www.wmata.com/');">Metrorail</li>
+                                            <li onclick="load_link('http://www.vre.org/');">Virginia Railway Express</li>
+                                            <li onclick="load_link('http://www.vatransit.org/');">Other local transit organizations</li>
+                                            <li onclick="load_link('http://bikevirginia.org/');">Bike Virginia</li>
+                                            <li onclick="load_link('http://www.vdot.virginia.gov/travel/hov-hro.asp');">HOV/Reversible Roadways</li>
+                                            <li onclick="load_link('http://www.vdot.virginia.gov/travel/faq-toll.asp');">Toll Roads</li>
+                                        </ul>
+                                    </li>
+                                    <li>Neighboring 511 Web Sites
+                                        <ul>
+                                            <li onclick="load_link('http://www.chart.state.md.us/travinfo/travinfo.asp');">Maryland</li>
+                                            <li onclick="load_link('http://www.ncdot.org/traffictravel/');">North Carolina</li>
+                                            <li onclick="load_link('https://smartway.tn.gov/traffic/');">Tennessee</li>
+                                            <li onclick="load_link('http://www.transportation.wv.gov/highways/traffic/Pages/roadconditions.aspx');">West Virginia</li>
+                                        </ul>
+                                    </li>
+                                    <li onclick="load_link('http://www.i95coalition.org/');">I-95 Corridor Coalition</li>
+                                    <li>Airports
+                                        <ul>
+                                            <li onclick="load_link('http://www.mwaa.com/dulles/dulles.htm');">Washington Dulles (IAD)</li>
+                                            <li onclick="load_link('http://www.mwaa.com/reagan/reagan.htm');">Ronald Reagan Washington National (DCA)</li>
+                                            <li onclick="load_link('http://www.norfolkairport.com/');">Norfolk (ORF)</li>
+                                            <li onclick="load_link('http://www.flyrichmond.com/');">Richmond (RIC)</li>
+                                            <li onclick="load_link('http://flyphf.com/');">Newport News/Williamsburg (PHF)</li>
+                                            <li onclick="load_link('http://www.roanokeairport.com/');">Roanoke (ROA)</li>
+                                            <li onclick="load_link('http://www.gocho.com/');">Charlottesville-Albemarie (CHO)</li>
+                                            <li onclick="load_link('http://www.lynchburgva.gov/lynchburg-regional-airport');">Lynchburg (LYH)</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li onclick="load_link('http://www.511virginia.org/rtb',1);">Reach the Beach</li>
+                            <li onclick="load_link('http://www.511virginia.org/nova', 1);">Northern Va. I-95/395</li>
+                            
+                            <li onclick="load_link('../feedback/?referer=thankyou.pl');">Contact Us</li>
+                            <li>Help
+                                <ul>
+                                    <li onclick="load_link('http://www.virginiadot.org/travel/about_511.asp');">About 511</li>
+                                    <li onclick="load_link('http://www.virginiadot.org/travel/511_virginia_faqs.asp');">Ask 511 (FAQ)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td style="width: 21px;">
+            <div style="background: url('http://files0.iteriscdn.com/WebApps/VA/SafeTravel/images/menu-right.png') repeat-x 0 0; height: 30px; width: 21px;">
+            </div>
+        </td>
+    </tr>
+</table>
+</div>
+<div id="wrapper_content">
+<p class="breadcrumbs" style="float: left;"><a href="/">Full Site</a> &gt; <a href=".?menu_id=main" class="breadcrumbs">Main Menu</a>&nbsp;&gt; <span class="breadcrumbs">Mobile Feeds</span></p>
+<div class="search" style="float: right;"><form action="."><div><label for="search" style="display: none">Search Site</label><input id="search" type="text" name="search" /><input type="hidden" name="menu_id" value="SearchResults" /><input type="submit" value="Site Search" /></div></form></div><div class='content' style='clear: both; border-top: solid gray 1px;'>
+	<h1 class="twitterName"><a href="http://twitter.com/511statewideva" target="_blank">Statewide</a></h1>
+	<ul>
+	
+		<li>Cleared: Accident: NB on I-295 at MM22 in Henrico Co.8:36PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722584686405545985" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: SB on I-95 at MM159 in Prince William Co.8:00PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722576136002256896" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: SB on I-95 at MM159 in Prince William Co. No lanes closed. Delay 1 mi.7:42PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722571119149117440" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: SB on I-95 at MM162 in Fairfax Co.7:40PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722570629866778625" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95R at MM170 in Fairfax Co.7:34PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722569073456988161" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Disabled Vehicle: SB on I-95R at MM170 in Fairfax Co. No lanes closed. Potential Delays.7:32PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722568598133284870" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: WB on I-66 at MM60 in Fairfax Co.7:30PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722568596677926912" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Disabled Vehicle: SB on I-95R at MM170 in Fairfax Co. Right shoulder closed. Potential Delays.7:28PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722567586005823488" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: WB on I-66 at MM60 in Fairfax Co. No lanes closed. Delay 2 mi.7:24PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722567077534560260" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: WB on I-66 at MM50 in Fairfax Co.7:24PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722567076171419648" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: EB on I-66 at MM71 in Arlington Co.7:24PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722567074816598016" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Disabled Vehicle: SB on I-95R at MM170 in Fairfax Co. 1 travel lane closed. Potential Delays.7:22PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722566072134725632" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-95R at MM170 in Fairfax Co. Right shoulder closed. Potential Delays.7:10PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722563058879610880" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: EB on I-66 at MM71 in Arlington Co. No lanes closed. Delay 2 mi.7:06PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722562569760829440" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: WB on I-66 at MM60 in Fairfax Co. No lanes closed. Delay 4 mi.7:04PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722561549882286081" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: WB on I-66 at MM50 in Fairfax Co. No lanes closed. Delay 3 mi.7:04PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722561548359712770" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: SB on I-95 at MM162 in Fairfax Co. No lanes closed. Delay 2 mi.7:02PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722561095869853697" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: EB on I-66 at MM71 in Arlington Co. No lanes closed. Delay 3 mi.6:42PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722556021986750465" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Delay: WB on I-66 at MM60 in Fairfax Co. No lanes closed. Delay 6 mi.6:40PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722555517965594626" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: SB on I-95 at MM132 in Stafford Co.6:28PM&nbsp; <a href="http://twitter.com/511statewideva/statuses/722552482510061568" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/I64VA" target="_blank">Interstate 64</a></h1>
+	<ul>
+	
+		<li>Cleared: Incident: EB on I-64 at MM183 in Henrico Co.11:56PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722635018288435202" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: WB on I-64 at MM181 in Henrico Co.11:44PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722631979200548864" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM185 in Henrico Co.11:26PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722627474153148417" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: WB on I-64 at MM181 in Henrico Co. No lanes closed. Potential Delays.11:14PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722624460810006529" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-64 at MM185 in Henrico Co. Left shoulder closed. Potential Delays.10:46PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722617392585695233" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: EB on I-64 at MM183 in Henrico Co. No lanes closed. Potential Delays.10:46PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722617390534672384" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM197 in Henrico Co.9:29PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722598591940792321" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-64 at MM197 in Henrico Co. No lanes closed. Potential Delays.9:22PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722596276358029313" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM200 in Henrico Co.9:12PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722593761163886592" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-64 at MM200 in Henrico Co. Right shoulder closed. Potential Delays.9:10PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722593254282240000" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: WB on I-64 at MM191 in Richmond.8:42PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722586202612842498" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Accident: WB on I-64 at MM191 in Richmond. Right shoulder closed. Potential Delays.7:56PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722575134280826880" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: WB on I-64 at MM190 in Richmond. Right shoulder closed. Potential Delays.7:38PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722570130719436801" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: WB on I-64 at MM170 in Goochland Co.7:34PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722569068792922113" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM192 in Richmond.7:24PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722567062833512448" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-64 at MM192 in Richmond. Right shoulder closed. Potential Delays.7:18PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722565072908914688" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: WB on I-64 at MM170 in Goochland Co. No lanes closed. Potential Delays.7:10PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722563054689468418" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: EB on I-64 at MM270 in Hampton.7:08PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722562557190488064" target="_blank">View on Twitter</a></li>
+	
+		<li>Delay: EB on I-64 at MM270 in Hampton. No lanes closed. Delay 2 mi.7:04PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722561537429397504" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: EB on I-64 at MM270 in Hampton.7:02PM&nbsp; <a href="http://twitter.com/I64VA/statuses/722561086336208896" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/I81VA" target="_blank">Interstate 81</a></h1>
+	<ul>
+	
+		<li>Cleared: brush fire: SB on I-81 at MM2 in Washington Co.9:06PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722592740819800064" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: brush fire: SB on I-81 at MM2 in Washington Co. Right shoulder closed. Potential Delays.8:52PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722588729693630464" target="_blank">View on Twitter</a></li>
+	
+		<li>brush fire: SB on I-81 at MM2 in Washington Co. 1 travel lane closed. Potential Delays.8:20PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722580662952325120" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Vehicle Fire: NB on I-81 at MM195 in Rockbridge Co.7:38PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722570132141252608" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Vehicle Fire: NB on I-81 at MM195 in Rockbridge Co. Right shoulder closed. Potential Delays.6:50PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722558030609530880" target="_blank">View on Twitter</a></li>
+	
+		<li>Vehicle Fire: NB on I-81 at MM195 in Rockbridge Co. 1 travel lane closed. Potential Delays.6:36PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722554491787153408" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: SB on I-81 at MM125 in Montgomery Co.6:22PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722550975756660736" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-81 at MM197 in Rockbridge Co.6:04PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722546445547618304" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-81 at MM197 in Rockbridge Co. Right shoulder closed. Potential Delays.5:58PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722544946440499200" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-81 at MM184 in Rockbridge Co.5:32PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722538382895771648" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Accident: SB on I-81 at MM125 in Montgomery Co. Right shoulder closed. Potential Delays.5:14PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722533866766995456" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-81 at MM184 in Rockbridge Co. Right shoulder closed. Potential Delays.5:10PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722532862738743296" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-81 at MM125 in Montgomery Co. Right shoulder closed. Potential Delays.5:08PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722532362114961408" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-81 at MM311 in Frederick Co.4:58PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722530361662697473" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-81 at MM69 in Wythe Co.4:50PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722528322643693569" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: NB on I-81 at MM3 in Bristol.4:40PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722525318137978880" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: NB on I-81 at MM218 in Augusta Co.4:30PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722522796203622404" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-81 at MM311 in Frederick Co. Right shoulder closed. Potential Delays.4:18PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722520279331835904" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-81 at MM311 in Frederick Co.4:16PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722519263144251392" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-81 at MM69 in Wythe Co. Right shoulder closed. Potential Delays.4:14PM&nbsp; <a href="http://twitter.com/I81VA/statuses/722518770049228801" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/I95VA" target="_blank">Interstate 95</a></h1>
+	<ul>
+	
+		<li>Update: Accident: SB on I-95 at MM135 in Stafford Co. 1 travel lane closed. Potential Delays.12:14AM&nbsp; <a href="http://twitter.com/I95VA/statuses/722640037674946564" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: SB on I-95 at MM133 in Stafford Co. 1 travel lane closed. Potential Delays.12:06AM&nbsp; <a href="http://twitter.com/I95VA/statuses/722637535927775232" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM172 in Fairfax Co.12:02AM&nbsp; <a href="http://twitter.com/I95VA/statuses/722637027762708484" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: NB on I-95 at MM76 in Richmond.11:54PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722634506872700928" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM58 in Chesterfield Co.11:48PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722633006721146880" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co.11:48PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722633005118963714" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM172 in Fairfax Co. Right shoulder closed. Potential Delays.11:48PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722633002581417985" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM58 in Chesterfield Co. No lanes closed. Potential Delays.11:42PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722631503121924098" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co. Right shoulder closed. Potential Delays.11:42PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722631501469392898" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM130 in Fredericksburg.11:30PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722628492651835392" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co.11:22PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722626460486365184" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95 at MM132 in Fredericksburg.11:20PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722625952346468353" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: NB on I-95 at MM76 in Richmond. No lanes closed. Potential Delays.11:18PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722625478113275906" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co. Right shoulder closed. Potential Delays.11:12PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722623948828123138" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: SB on I-95 at MM129 in Fredericksburg.11:10PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722623441090846720" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM138 in Stafford Co.10:50PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722618410144776193" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM138 in Stafford Co. Right shoulder closed. Potential Delays.10:40PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722615895806341120" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-95 at MM132 in Fredericksburg. Right shoulder closed. Potential Delays.10:24PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722611861657673728" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95 at MM76 in Richmond.10:20PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722610839543554048" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM130 in Fredericksburg. Right shoulder closed. Potential Delays.10:10PM&nbsp; <a href="http://twitter.com/I95VA/statuses/722608337683103745" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/511centralva" target="_blank">Central Virginia</a></h1>
+	<ul>
+	
+		<li>Cleared: Incident: NB on VA-150 at MM10 in Chesterfield Co.12:24AM&nbsp; <a href="http://twitter.com/511centralva/statuses/722642059191021569" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-295 at MM22 in Henrico Co. No lanes closed. Potential Delays.12:20AM&nbsp; <a href="http://twitter.com/511centralva/statuses/722641049362001920" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: EB on I-64 at MM183 in Henrico Co.11:56PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722635016707182593" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: NB on I-95 at MM76 in Richmond.11:54PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722634505505398785" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM58 in Chesterfield Co.11:48PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722633000958238720" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-85 at MM31 in Brunswick Co. No lanes closed. Potential Delays.11:46PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722632484521975810" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: WB on I-64 at MM181 in Henrico Co.11:44PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722631977824870401" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM58 in Chesterfield Co. No lanes closed. Potential Delays.11:42PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722631500043325440" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: NB on VA-150 at MM10 in Chesterfield Co. No lanes closed. Potential Delays.11:32PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722628964355829760" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM185 in Henrico Co.11:26PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722627472576135168" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: NB on I-95 at MM76 in Richmond. No lanes closed. Potential Delays.11:18PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722625471213662208" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: WB on I-64 at MM181 in Henrico Co. No lanes closed. Potential Delays.11:14PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722624459442622464" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-64 at MM185 in Henrico Co. Left shoulder closed. Potential Delays.10:46PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722617389175685120" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: EB on I-64 at MM183 in Henrico Co. No lanes closed. Potential Delays.10:46PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722617387711873025" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-295 at MM34 in Hanover Co.10:36PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722614871028850688" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: EB on VA-40 at MM143 in Lunenburg Co.10:30PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722613388963115009" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-295 at MM34 in Hanover Co. No lanes closed. Potential Delays.10:30PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722613387486748672" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95 at MM76 in Richmond.10:20PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722610838138458116" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: EB on VA-40 at MM143 in Lunenburg Co. No lanes closed. Potential Delays.10:16PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722609860517474304" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95 at MM116 in Caroline Co.10:00PM&nbsp; <a href="http://twitter.com/511centralva/statuses/722605841950576644" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/511hamptonroads" target="_blank">Hampton Roads</a></h1>
+	<ul>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-664 at MM3 in Hampton.11:28PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722627980602818560" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: SB on I-664 at MM2 in Hampton.11:04PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722621941325148160" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Disabled Vehicle: SB on I-664 at MM3 in Hampton. 1 travel lane closed. Potential Delays.10:36PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722614872551342080" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: SB on I-664 at MM2 in Hampton. Entr ramp closed. Potential Delays.10:34PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722614365434863616" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-664 at MM3 in Newport News. 1 travel lane closed. Potential Delays.10:28PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722612879724183552" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: NB on I-95 at MM2 in Greensville Co.10:00PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722605843854835714" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: NB on I-95 at MM2 in Greensville Co. No lanes closed. Potential Delays.9:48PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722602798836281344" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95 at MM31 in Sussex Co.9:02PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722591239451885569" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-95 at MM31 in Sussex Co. No lanes closed. Potential Delays.8:46PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722587182603583488" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: WB on US-60 at On US-60W at 15th View in Norfolk.7:20PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722565584345546752" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: EB on I-64 at MM270 in Hampton.7:08PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722562555303092225" target="_blank">View on Twitter</a></li>
+	
+		<li>Delay: EB on I-64 at MM270 in Hampton. No lanes closed. Delay 2 mi.7:04PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722561535755821056" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: EB on I-64 at MM270 in Hampton.7:02PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722561084280958976" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Bridge/Tunnel Stoppage: NB on I-664 at MM9 in Suffolk.6:54PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722559061636603904" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Bridge/Tunnel Stoppage: SB on I-664 at MM8 in Newport News.6:54PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722559060013412352" target="_blank">View on Twitter</a></li>
+	
+		<li>Bridge/Tunnel Stoppage: SB on I-664 at MM8 in Newport News. All travel lanes closed. Potential Delays.6:50PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722558029149954048" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Bridge/Tunnel Stoppage: WB on I-64 at MM272 in Norfolk.6:48PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722557502685126657" target="_blank">View on Twitter</a></li>
+	
+		<li>Bridge/Tunnel Stoppage: NB on I-664 at MM9 in Suffolk. All travel lanes closed. Potential Delays.6:46PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722557017697738753" target="_blank">View on Twitter</a></li>
+	
+		<li>Bridge/Tunnel Stoppage: WB on I-64 at MM272 in Norfolk. All travel lanes closed. Potential Delays.6:46PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722557016309424128" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Delay: WB on I-64 at MM272 in Norfolk.6:46PM&nbsp; <a href="http://twitter.com/511hamptonroads/statuses/722557014963040257" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/511northernva" target="_blank">Northern Virginia</a></h1>
+	<ul>
+	
+		<li>Update: Accident: SB on I-95 at MM135 in Stafford Co. 1 travel lane closed. Potential Delays.12:14AM&nbsp; <a href="http://twitter.com/511northernva/statuses/722640039050612738" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: SB on I-95 at MM133 in Stafford Co. 1 travel lane closed. Potential Delays.12:06AM&nbsp; <a href="http://twitter.com/511northernva/statuses/722637537626451968" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM172 in Fairfax Co.12:02AM&nbsp; <a href="http://twitter.com/511northernva/statuses/722637029369069570" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-395 at MM4 in Alexandria.11:56PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722635020020662272" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-395 at MM4 in Alexandria. Right shoulder closed. Potential Delays.11:50PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722633515603488768" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co.11:48PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722633009816596482" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM172 in Fairfax Co. Right shoulder closed. Potential Delays.11:48PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722633008252116993" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co. Right shoulder closed. Potential Delays.11:42PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722631504539611137" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: EB on I-66 at MM47 in Prince William Co.11:36PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722629976252616704" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM130 in Fredericksburg.11:30PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722628494128259073" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co.11:22PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722626463376261120" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-95 at MM132 in Fredericksburg.11:20PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722625955030835200" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM119 in Spotsylvania Co. Right shoulder closed. Potential Delays.11:12PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722623950312882176" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: SB on I-95 at MM129 in Fredericksburg.11:10PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722623442680471552" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: EB on I-66 at MM47 in Prince William Co. Right shoulder closed. Potential Delays.11:04PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722621943254528002" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-66 at MM57 in Fairfax Co.10:54PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722619423677399041" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-95 at MM138 in Stafford Co.10:50PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722618411881246720" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-66 at MM53 in Fairfax Co.10:44PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722617400462589952" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-66 at MM53 in Fairfax Co. Right shoulder closed. Potential Delays.10:42PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722616403753312258" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-95 at MM138 in Stafford Co. Right shoulder closed. Potential Delays.10:40PM&nbsp; <a href="http://twitter.com/511northernva/statuses/722615897274376192" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/511northwestva" target="_blank">Northwest Virginia</a></h1>
+	<ul>
+	
+		<li>Cleared: Vehicle Fire: NB on I-81 at MM195 in Rockbridge Co.7:38PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722570138235637760" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Vehicle Fire: NB on I-81 at MM195 in Rockbridge Co. Right shoulder closed. Potential Delays.6:50PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722558032211767296" target="_blank">View on Twitter</a></li>
+	
+		<li>Vehicle Fire: NB on I-81 at MM195 in Rockbridge Co. 1 travel lane closed. Potential Delays.6:36PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722554494928732160" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-81 at MM197 in Rockbridge Co.6:04PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722546452824723457" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-81 at MM197 in Rockbridge Co. Right shoulder closed. Potential Delays.5:58PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722544950815154177" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: NB on US-29 at MM135 in Albemarle Co.5:34PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722538899864731652" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-81 at MM184 in Rockbridge Co.5:32PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722538386129620992" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: NB on US-29 at MM135 in Albemarle Co. 1 travel lane closed. Potential Delays.5:16PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722534347694350337" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-81 at MM184 in Rockbridge Co. Right shoulder closed. Potential Delays.5:10PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722532864361951232" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-81 at MM311 in Frederick Co.4:58PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722530364745465856" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM132 in Louisa Co.4:56PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722529341700186116" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: WB on I-64 at MM132 in Louisa Co. Right shoulder closed. Potential Delays.4:46PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722527324093161474" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: NB on I-81 at MM218 in Augusta Co.4:30PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722522815107346432" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-81 at MM311 in Frederick Co. Right shoulder closed. Potential Delays.4:18PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722520298646581250" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-81 at MM311 in Frederick Co.4:16PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722519271700570112" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-81 at MM311 in Frederick Co. Right shoulder closed. Potential Delays.4:11PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722518286659907584" target="_blank">View on Twitter</a></li>
+	
+		<li>Accident: NB on I-81 at MM218 in Augusta Co. Right shoulder closed. Potential Delays.4:02PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722515827417882624" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: EB on I-64 at MM103 in Albemarle Co.3:40PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722510240810463232" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM123 in Albemarle Co.3:34PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722508714608037888" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: WB on I-64 at MM103 in Albemarle Co.3:34PM&nbsp; <a href="http://twitter.com/511northwestva/statuses/722508712829718528" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+	<h1 class="twitterName"><a href="http://twitter.com/511southwestva" target="_blank">Southwest Virginia</a></h1>
+	<ul>
+	
+		<li>Cleared: brush fire: SB on I-81 at MM2 in Washington Co.9:06PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722592742161969153" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: brush fire: SB on I-81 at MM2 in Washington Co. Right shoulder closed. Potential Delays.8:52PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722588731094511616" target="_blank">View on Twitter</a></li>
+	
+		<li>brush fire: SB on I-81 at MM2 in Washington Co. 1 travel lane closed. Potential Delays.8:20PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722580664483233792" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Bridge/Tunnel Stoppage: SB on I-77 at MM67 in Bland Co.7:42PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722571117722996736" target="_blank">View on Twitter</a></li>
+	
+		<li>Bridge/Tunnel Stoppage: SB on I-77 at MM67 in Bland Co. All travel lanes closed. Potential Delays.7:28PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722567584558817280" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-77 at MM21 in Carroll Co.6:48PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722557506636156928" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-77 at MM21 in Carroll Co. Right shoulder closed. Potential Delays.6:38PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722555015618031617" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Accident: SB on I-81 at MM125 in Montgomery Co.6:22PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722550978831126528" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-581 at MM0 in Roanoke.6:16PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722549492155883520" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-581 at MM0 in Roanoke. Left shoulder closed. Potential Delays.6:08PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722547979824062465" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on US-220 at MM43 in Franklin Co.6:02PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722546456696111108" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: NB on I-581 at MM1 in Roanoke.6:04PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722546455286792196" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on US-220 at MM43 in Franklin Co. 1 travel lane closed. Potential Delays.5:52PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722543940281507841" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: NB on I-581 at MM1 in Roanoke. Entr ramp closed. Potential Delays.5:32PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722538387677323264" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Incident: SB on I-77 at MM8 in Carroll Co.5:20PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722535382760497153" target="_blank">View on Twitter</a></li>
+	
+		<li>Incident: SB on I-77 at MM8 in Carroll Co. 1 travel lane closed. Potential Delays.5:18PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722534906451095552" target="_blank">View on Twitter</a></li>
+	
+		<li>Update: Accident: SB on I-81 at MM125 in Montgomery Co. Right shoulder closed. Potential Delays.5:14PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722533872597118976" target="_blank">View on Twitter</a></li>
+	
+		<li>Disabled Vehicle: SB on I-81 at MM125 in Montgomery Co. Right shoulder closed. Potential Delays.5:08PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722532368662282245" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on I-81 at MM69 in Wythe Co.4:50PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722528330147303424" target="_blank">View on Twitter</a></li>
+	
+		<li>Cleared: Disabled Vehicle: SB on US-220 at MM43 in Franklin Co.4:48PM&nbsp; <a href="http://twitter.com/511southwestva/statuses/722527325682864128" target="_blank">View on Twitter</a></li>
+	
+	</ul>
+
+</div><p class='menu' style='clear: both; border-top: solid gray 1px; border-bottom: solid gray 1px;'><a href=".?menu_id=main" class="menuitem lastitem" accesskey="0">0. Main Menu</a>&nbsp;&nbsp;</p><span class="sitemap"><a href=".?menu_id=SiteMapResults">Site Map</a></span></div>
+
+<div id="footer" class="clearfix">
+	<p class="copyright"><script type="text/javascript">var cp = new Date();document.write('&copy;' + cp.getFullYear());</script> Virginia Department of Transportation | <a href="http://www.virginiadot.org/info/accessibility.asp" target="_blank">WAI Compliance</a> | <a href="http://www.virginiadot.org/info/foia.asp" target="_blank">Freedom of Information Act</a> | <a href="/mobile/" target="_blank">Text Version</a><br />This website includes hyperlinks to sites neither controlled nor sponsored by VDOT or the<br/> Commonwealth of Virginia. Links may open in a new window.</p>
+	<div id="footer-social" class="clearfix">
+		<div class="white" style="float: left; font-weight: bold; color: #FFFFFF; margin-right: 10px; font-size: 14px;">Need Help?</div>
+		<div class="white" style="float: left; text-align: right; color: #FFFFFF; font-size: 12px; margin-right: 20px;">800-FOR-ROAD<br/>800-367-7623</div>
+		<div id="social-icons" style="float: left;">
+			<span class="icons" style="position: relative; top: 5px;">
+				<a href="http://www.virginiadot.org/newsroom/vdot_twitter_feeds.asp" target="_blank"><img src="shared/images/icon-twitter.png" alt="Twitter" /></a>
+				<a href="http://www.flickr.com/photos/vadot" target="_blank"><img src="shared/images/icon-flickr.png" alt="Flickr" /></a>
+				<a href="http://www.facebook.com/VirginiaDOT" target="_blank"><img src="shared/images/icon-facebook.png" alt="Facebook" /></a>
+				<a href="http://www.youtube.com/vdotweb" target="_blank"><img src="shared/images/icon-youtube.png" alt="YouTube" /></a>
+				<a href="http://www.virginiadot.org/newsroom/subscribe_to_rss.asp" target="_blank"><img src="shared/images/icon-rss.png" alt="News room" /></a>
+			</span>
+		</div><!--End social-icons-->
+		<div style="clear: both;"></div>
+	</div><!--End footer-social-->
+</div><!--End footer-->
+
+</body>
+
+</html>
