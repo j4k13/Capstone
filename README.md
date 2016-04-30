@@ -1,4 +1,4 @@
-# Capstone
+#Capstone
 AUTHOR: Jacqueline Anderson
 
 WHAT YOU WILL NEED:
@@ -19,8 +19,4 @@ HOW TO INSTALL:
 	05 * * * * root cd /var/www/html/Capstone;/usr/bin/php /var/www/html/Capstone/tryTraffic.php
 	06 * * * * root cd /var/www/html/Capstone;/usr/bin/php /var/www/html/Capstone/weatherStrip.php
 	07 * * * * root cd /var/www/html/Capstone; sh fileclear.sh
-
-EXPANSION:
-----------
-
-
+From this point it should be operating properlly.
